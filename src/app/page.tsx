@@ -17,31 +17,47 @@ export default function Home() {
     queryFn: getDemonList,
     initialData: [],
   });
-  const [text, setText] = useState('');
+  const [texts, setTexts] = useState<string[]>([]);
   const stats = useMemo(() => {
-    return parseLevelStats(text);
-  }, [text]);
+    return parseLevelStats(texts);
+  }, [texts]);
   const levelData = useMemo(() => {
-    if (stats.levelName) {
-      return findLevelByName(demonlist, stats.levelName);
-    } else {
-      return null;
-    }
+    const levels = stats.data.map((level) => {
+      if (level?.levelName) {
+        return findLevelByName(demonlist, level.levelName);
+      }
+    });
+    const level = levels.find((level) => level);
+
+    return level || null;
   }, [demonlist, stats]);
   const imageUrl =
     levelData?.level_id && getLevelThumbnailById(levelData.level_id);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    const file = files && files[0];
-    if (file && file.type === 'text/plain') {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = (event.target as FileReader)?.result;
-        setText(result as string);
-      };
-      reader.readAsText(file);
-    }
+    if (!files) return;
+
+    const textFiles = Array.from(files).filter(
+      (file) => file.type === 'text/plain'
+    );
+
+    const readers = textFiles.map((file) => {
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsText(file);
+      });
+    });
+
+    Promise.all(readers)
+      .then((contents) => {
+        setTexts(contents); // Массив строк
+      })
+      .catch((err) => {
+        console.error('Error reading files:', err);
+      });
   };
 
   return (
@@ -52,45 +68,65 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.wrapper}>
           <div className={styles.back}></div>
-          {!!stats.attempts && (
+          {!!stats.totalAttempts && (
             <div className={styles.rate}>
               <span className={styles.grade}>A+</span>
               <span className={styles.beta}>(beta)</span>
             </div>
           )}
-          <div className={styles.title}>{stats.levelName}</div>
+          <div className={styles.title}>
+            {stats.data.map((level, index) => (
+              <span key={index}>
+                {level.levelName}
+                {index + 1 < stats.data.length && (
+                  <span style={{ color: '#555' }}>,</span>
+                )}{' '}
+              </span>
+            ))}
+          </div>
           <div className={styles.subtitle}>
-            {stats.attempts ? (
+            {stats.totalAttempts ? (
               <>
-                Attempts: <b>{stats.attempts}</b>
+                Attempts: <b>{stats.totalAttempts}</b>
               </>
             ) : (
               'Select a level'
             )}
-            {!!stats.attempts && <span>/ {stats.playtime}</span>}
+            {!!stats.totalAttempts && <span>/ {stats.totalPlaytime}</span>}
           </div>
           <hr className={styles.hr} />
           <p className={styles.paragraph}>Runs</p>
-          <ProgressBar text={text} />
+          <ProgressBar texts={texts} />
           <p className={styles.paragraph}>From zero</p>
-          <ProgressBar text={text} fromZero />
+          <ProgressBar texts={texts} fromZero />
           <hr className={styles.hr} />
           <div className={styles.content}>
-            <label className={styles.label}>
-              <input
-                type="file"
-                accept=".txt"
-                onChange={handleFileChange}
-                className={styles.hiddenInput}
-              />
-              <span className={styles.labelText}>📄 Загрузить .txt файл</span>
-            </label>
-            <textarea
+            <div className={styles.buttons}>
+              <label className={styles.button}>
+                <input
+                  type="file"
+                  accept=".txt"
+                  onChange={handleFileChange}
+                  className={styles.hiddenInput}
+                  multiple
+                  draggable
+                />
+                <span className={styles.labelText}>
+                  📄 Load backup files (.txt)
+                </span>
+              </label>
+              {!!texts.length && (
+                <button className={styles.button} onClick={() => setTexts([])}>
+                  RESET
+                </button>
+              )}
+            </div>
+            {/* <textarea
               value={text}
               readOnly
               rows={10}
               className={styles.textarea}
-            />
+            /> */}
             {levelData && (
               <>
                 <p
@@ -107,9 +143,6 @@ export default function Home() {
                 />
               </>
             )}
-            <button className={styles.button} onClick={() => setText('')}>
-              RESET PROGRESS BAR
-            </button>
           </div>
         </div>
       </main>

@@ -7,30 +7,31 @@ import { parseFromZeroData } from '../../../utils/parseFromZeroData';
 import { parseNormalData } from '../../../utils/parseNormalData';
 
 export function ProgressBar({
-  text,
+  texts,
   fromZero = false,
 }: {
-  text: string;
+  texts: string[];
   fromZero?: boolean;
 }) {
   const { data, maxReached } = useMemo(() => {
-    if (!text.trim()) return { data: [], maxReached: 0 };
+    const filteredTexts = texts.filter((text) => text.trim());
+    if (!filteredTexts.length) return { data: [], maxReached: 0 };
 
     if (fromZero) {
-      const data = parseFromZeroData(text);
+      const data = parseFromZeroData(filteredTexts);
 
       return {
         data,
         maxReached: Math.max(...data.map((d) => ('to' in d ? d.to : 0))),
       };
     } else {
-      const data = parseNormalData(text);
+      const data = parseNormalData(filteredTexts);
       const maxPercent =
         data.length > 0 ? Math.max(...data.map((d) => d.to)) : 0;
 
       return { data, maxReached: maxPercent };
     }
-  }, [text, fromZero]);
+  }, [texts, fromZero]);
 
   if (data.length === 0) {
     // Показываем 50% заполненный прогресс серым цветом, если нет данных
