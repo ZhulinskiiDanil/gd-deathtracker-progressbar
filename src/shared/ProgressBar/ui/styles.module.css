@@ -1,0 +1,25 @@
+.progressBarWrapper {
+  padding: 0.5rem 1rem 2rem 1rem;
+}
+
+.progressBar {
+  display: flex;
+  width: 100%;
+  height: 1.5rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #111;
+  transition: height 0.3s ease;
+  cursor: pointer;
+}
+
+.progressBarWrapper:hover .progressBar {
+  height: 2rem;
+}
+
+.progressBar > div:hover {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 2rem 0.25rem black;
+  border: 1px solid white;
+}
