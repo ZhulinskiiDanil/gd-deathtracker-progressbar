@@ -8,8 +8,8 @@ export async function GET() {
     );
 
     return NextResponse.json(response.data);
-  } catch (error: any) {
-    console.error('Ошибка при получении данных:', error.message);
+  } catch (error) {
+    console.error('Ошибка при получении данных:', error);
     return NextResponse.json(
       { error: 'Не удалось получить данные с Demonlist API' },
       { status: 500 }
