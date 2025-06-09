@@ -100,7 +100,7 @@ export function ProgressBar({
             if (entry) {
               to = entry.to;
               freq = entry.freq;
-              label = `${percent} ${entry.from}% - ${entry.to}%`;
+              label = `${entry.from}% - ${entry.to}%`;
             }
           } else {
             const entry = data.find(
@@ -113,7 +113,7 @@ export function ProgressBar({
 
             if (entry) {
               to = entry.to;
-              label = `${percent} ${entry.from}% - ${entry.to}%`;
+              label = `${entry.from}% - ${entry.to}%`;
               freq = entry.freq;
             }
           }
