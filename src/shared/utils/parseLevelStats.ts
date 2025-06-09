@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 type ParsedData = {
   levelName: string | null;
   playtime: string;
@@ -17,7 +19,7 @@ function formatPlaytime(seconds: number): string {
 }
 
 export function parseLevelStats(texts: string[]) {
-  const data: ParsedData[] = texts.map((text) => {
+  const _data: ParsedData[] = texts.map((text) => {
     const levelNameMatch = text.match(/^(.+?):/m);
     const playtimeMatch = text.match(/playtime\s*-\s*([^\n]+)/i);
     const attemptsMatch = text.match(/(\d+)\s+attempts/i);
@@ -71,6 +73,7 @@ export function parseLevelStats(texts: string[]) {
       hasSavedRuns,
     };
   });
+  const data = _.uniqBy(_data, (level) => level.levelName);
 
   const totalPlaytimeSeconds = data.reduce(
     (acc, elm) => acc + elm.playtime_timestamp,

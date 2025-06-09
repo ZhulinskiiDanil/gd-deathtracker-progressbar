@@ -53,7 +53,7 @@ export default function Home() {
 
     Promise.all(readers)
       .then((contents) => {
-        setTexts(contents); // Массив строк
+        setTexts((pre) => [...pre, ...contents]);
       })
       .catch((err) => {
         console.error('Error reading files:', err);
@@ -117,7 +117,7 @@ export default function Home() {
               </label>
               {!!texts.length && (
                 <button className={styles.button} onClick={() => setTexts([])}>
-                  RESET
+                  Clear levels
                 </button>
               )}
             </div>
