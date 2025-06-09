@@ -4,13 +4,29 @@ import styles from './page.module.css';
 import { useMemo, useState } from 'react';
 import { parseLevelStats } from '@/shared/utils/parseLevelStats';
 
+import { useQuery } from '@tanstack/react-query';
+import { getDemonList } from '@/shared/api/getDemonList';
+
 import { ProgressBar } from '@/shared/ProgressBar/ui';
+import { findLevelByName } from '@/shared/utils/demonlist/findLevelByName';
 
 export default function Home() {
+  const { data: demonlist } = useQuery({
+    queryKey: ['demonlist'],
+    queryFn: getDemonList,
+    initialData: [],
+  });
   const [text, setText] = useState('');
   const stats = useMemo(() => {
     return parseLevelStats(text);
   }, [text]);
+  const levelData = useMemo(() => {
+    if (stats.levelName) {
+      return findLevelByName(demonlist, stats.levelName);
+    } else {
+      return null;
+    }
+  }, [demonlist]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -27,6 +43,7 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
+      {/* <img alt="Level" src={levelData}  /> */}
       <main className={styles.main}>
         <div className={styles.wrapper}>
           <div className={styles.back}></div>
@@ -62,6 +79,22 @@ export default function Home() {
               rows={10}
               className={styles.textarea}
             />
+            {levelData && (
+              <>
+                <p
+                  className={styles.paragraph}
+                  style={{ marginTop: '1rem', fontSize: '2rem' }}
+                >
+                  Demonlist data
+                </p>
+                <textarea
+                  value={JSON.stringify(levelData, undefined, 2)}
+                  readOnly
+                  rows={10}
+                  className={styles.textarea}
+                />
+              </>
+            )}
             <button className={styles.button} onClick={() => setText('')}>
               Reset progress bar
             </button>

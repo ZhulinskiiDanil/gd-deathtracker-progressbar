@@ -1,5 +1,5 @@
 type ParsedData = {
-  title: string;
+  levelName: string | null;
   playtime: string;
   playtime_timestamp: number;
   attempts: number;
@@ -10,7 +10,7 @@ type ParsedData = {
 };
 
 export function parseLevelStats(text: string): ParsedData {
-  const titleMatch = text.match(/^The (.+?):/m);
+  const levelNameMatch = text.match(/^(.+?):/m);
   const playtimeMatch = text.match(/playtime\s*-\s*([^\n]+)/i);
   const attemptsMatch = text.match(/(\d+)\s+attempts/i);
   const from0SectionMatch = text.match(/From 0:\n([\s\S]+?)\n\s*\n/);
@@ -53,7 +53,7 @@ export function parseLevelStats(text: string): ParsedData {
   }
 
   return {
-    title: titleMatch ? titleMatch[1].trim() : 'Unknown',
+    levelName: levelNameMatch ? levelNameMatch[1].trim() : null,
     playtime: playtimeStr,
     playtime_timestamp: playtimeTimestamp,
     attempts: attemptsMatch ? parseInt(attemptsMatch[1], 10) : 0,
