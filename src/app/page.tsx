@@ -216,10 +216,12 @@ function ProgressBar({
           if (fromZero) {
             const entry = data.find(
               (d): d is { from: number; to: number; freq: number } =>
-                typeof (d as any).from === 'number' &&
-                typeof (d as any).to === 'number' &&
-                i >= (d as any).from &&
-                i < (d as any).to
+                'from' in d &&
+                typeof d.from === 'number' &&
+                'to' in d &&
+                typeof d.to === 'number' &&
+                i >= d.from &&
+                i < d.to
             );
 
             if (entry) {
