@@ -1,6 +1,6 @@
 import styles from './GridItem.module.css';
 
-const GridItem = ({
+export const GridItem = ({
   title,
   children,
 }: React.PropsWithChildren<{ title: string }>) => {
@@ -11,5 +11,3 @@ const GridItem = ({
     </div>
   );
 };
-
-export default GridItem;

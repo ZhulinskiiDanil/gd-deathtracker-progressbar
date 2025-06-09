@@ -1,19 +1,21 @@
 'use client';
 import styles from './page.module.css';
 
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { parseLevelStats } from '@/shared/utils/parseLevelStats';
+import { findLevelByName } from '@/shared/utils/demonlist/findLevelByName';
+import { getLevelThumbnailById } from '@/shared/utils/getLevelThumbnailById';
 
 import { useQuery } from '@tanstack/react-query';
 import { getDemonList } from '@/shared/api/getDemonList';
 
-import { ProgressBar } from '@/shared/ui/ProgressBar/ui';
-import { findLevelByName } from '@/shared/utils/demonlist/findLevelByName';
-import { getLevelThumbnailById } from '@/shared/utils/getLevelThumbnailById';
-import Grid from '@/shared/ui/Grid/ui';
-import GridItem from '@/shared/ui/GridItem/ui';
+import { Grid } from '@/shared/ui/Grid/ui';
+import { GridItem } from '@/shared/ui/GridItem/ui';
+import { UIButton } from '@/shared/ui/Button/ui';
+import { LevelCollectedData } from '@/widgets/LevelCollectedData/ui';
 
 export default function Home() {
+  const fileLabelId = useId();
   const { data: demonlist } = useQuery({
     queryKey: ['demonlist'],
     queryFn: getDemonList,
@@ -97,30 +99,38 @@ export default function Home() {
             {!!stats.totalAttempts && <span>/ {stats.totalPlaytime}</span>}
           </div>
           <hr className={styles.hr} style={{ marginBottom: '1rem' }} />
-          <p className={styles.paragraph}>Runs</p>
-          <ProgressBar texts={texts} />
-          <p className={styles.paragraph}>From zero</p>
-          <ProgressBar texts={texts} fromZero />
+          <LevelCollectedData texts={texts} />
           <hr className={styles.hr} style={{ marginTop: '1rem' }} />
           <div className={styles.content}>
             <div className={styles.buttons}>
-              <label className={styles.button}>
-                <input
-                  type="file"
-                  accept=".txt"
-                  onChange={handleFileChange}
-                  className={styles.hiddenInput}
-                  multiple
-                  draggable
-                />
-                <span className={styles.labelText}>
+              <input
+                id={fileLabelId}
+                type="file"
+                accept=".txt"
+                onChange={handleFileChange}
+                className={styles.hiddenInput}
+                multiple
+                draggable
+              />
+              <label htmlFor={fileLabelId} className={styles.button}>
+                <UIButton
+                  big
+                  fill
+                  type="button"
+                  onClick={() => document.getElementById(fileLabelId)?.click()}
+                >
                   📄 Load backup files (.txt)
-                </span>
+                </UIButton>
               </label>
               {!!texts.length && (
-                <button className={styles.button} onClick={() => setTexts([])}>
+                <UIButton
+                  big
+                  fill
+                  className={styles.button}
+                  onClick={() => setTexts([])}
+                >
                   Clear levels
-                </button>
+                </UIButton>
               )}
             </div>
             {levelData && (
