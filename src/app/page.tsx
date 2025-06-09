@@ -177,12 +177,6 @@ function ProgressBar({
   return (
     <div className={styles.progressBarWrapper}>
       {/* Метки сверху */}
-      <p
-        className={styles.title}
-        style={{ fontSize: '2rem', padding: '1rem', paddingLeft: 0 }}
-      >
-        Max reached: {maxReached}
-      </p>
       <div
         style={{
           display: 'flex',
