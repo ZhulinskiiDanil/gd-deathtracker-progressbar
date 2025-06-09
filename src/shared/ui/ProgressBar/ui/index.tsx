@@ -2,9 +2,9 @@ import styles from './styles.module.css';
 
 import { useMemo } from 'react';
 
-import { interpolateColor } from '../../utils/interpolateColor';
-import { parseFromZeroData } from '../../utils/parseFromZeroData';
-import { parseNormalData } from '../../utils/parseNormalData';
+import { interpolateColor } from '../../../utils/interpolateColor';
+import { parseFromZeroData } from '../../../utils/parseFromZeroData';
+import { parseNormalData } from '../../../utils/parseNormalData';
 
 export function ProgressBar({
   text,
@@ -100,7 +100,7 @@ export function ProgressBar({
             if (entry) {
               to = entry.to;
               freq = entry.freq;
-              label = `${entry.from}% - ${entry.to}%`;
+              label = `${percent} ${entry.from}% - ${entry.to}%`;
             }
           } else {
             const entry = data.find(
@@ -113,7 +113,7 @@ export function ProgressBar({
 
             if (entry) {
               to = entry.to;
-              label = `${entry.from}% - ${entry.to}%`;
+              label = `${percent} ${entry.from}% - ${entry.to}%`;
               freq = entry.freq;
             }
           }
@@ -129,7 +129,7 @@ export function ProgressBar({
                 flex: 1,
                 backgroundColor: show
                   ? freq > 0 && !isEmptyCell
-                    ? interpolateColor(freq, maxFreq)
+                    ? interpolateColor(percent, freq, maxFreq, fromZero)
                     : 'rgba(80, 80, 80, 0.15)' // серый, если дошёл, но не умер
                   : 'transparent', // не дошёл — прозрачный
                 transition: 'background-color 0.3s',

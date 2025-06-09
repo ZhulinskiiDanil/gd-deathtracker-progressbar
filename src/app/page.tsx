@@ -7,7 +7,7 @@ import { parseLevelStats } from '@/shared/utils/parseLevelStats';
 import { useQuery } from '@tanstack/react-query';
 import { getDemonList } from '@/shared/api/getDemonList';
 
-import { ProgressBar } from '@/shared/ProgressBar/ui';
+import { ProgressBar } from '@/shared/ui/ProgressBar/ui';
 import { findLevelByName } from '@/shared/utils/demonlist/findLevelByName';
 import { getLevelThumbnailById } from '@/shared/utils/getLevelThumbnailById';
 
