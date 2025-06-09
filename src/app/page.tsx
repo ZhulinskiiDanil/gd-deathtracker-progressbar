@@ -25,9 +25,9 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.back}></div>
         <div className={styles.wrapper}>
-          <p className={styles.title}>Runs</p>
-          <ProgressBar text={text} />
           <p className={styles.title}>From zero</p>
+          <ProgressBar text={text} />
+          <p className={styles.title}>Runs</p>
           <ProgressBar text={text} fromZero />
           <div className={styles.content}>
             <label className={styles.label}>
@@ -132,6 +132,9 @@ function ProgressBar({
   }
 
   const maxFreq = Math.max(...data.map((d) => d.freq));
+  const maxReached = fromZero
+    ? Math.max(...data.map((d) => ('to' in d ? d.to : 0)))
+    : Math.max(...data.map((d) => ('percent' in d ? d.percent : 0)));
 
   return (
     <div className={styles.progressBarWrapper}>
@@ -161,29 +164,45 @@ function ProgressBar({
 
       {/* Прогресс-бар */}
       <div className={styles.progressBar} style={{ display: 'flex' }}>
-        {data.map((entry, idx) => {
-          let label,
-            freq = 0;
-          const from = 'from' in entry ? entry.from : null;
-          const to = 'to' in entry ? entry.to : null;
-          const percent = 'percent' in entry ? entry.percent : null;
-
-          if (fromZero && from !== null && to !== null) {
-            label = `${from}% - ${to}%`;
-            freq = entry.freq;
-          } else if (percent !== null) {
-            label = `${percent}%`;
-            freq = entry.freq;
+        {[...Array(100)].map((_, i) => {
+          let freq = 0;
+          let label = `${i}%`;
+          if (fromZero) {
+            const entry = data.find(
+              (d): d is { from: number; to: number; freq: number } =>
+                typeof (d as any).from === 'number' &&
+                typeof (d as any).to === 'number' &&
+                i >= (d as any).from &&
+                i < (d as any).to
+            );
+            if (entry) {
+              freq = entry.freq;
+              label = `${entry.from}% - ${entry.to}%`;
+            }
+          } else {
+            const entry = data.find(
+              (d): d is { percent: number; freq: number } =>
+                typeof (d as any).percent === 'number' &&
+                (d as any).percent === i
+            );
+            if (entry) {
+              freq = entry.freq;
+            }
           }
+
+          const show = i <= maxReached;
 
           return (
             <div
-              key={idx}
-              title={`${label} — ${freq} deaths`}
+              key={i}
+              title={freq > 0 ? `${label} — ${freq} deaths` : undefined}
               style={{
                 flex: 1,
-                backgroundColor:
-                  freq > 0 ? interpolateColor(freq, maxFreq) : 'transparent',
+                backgroundColor: show
+                  ? freq > 0
+                    ? interpolateColor(freq, maxFreq)
+                    : 'rgba(80, 80, 80, 0.15)' // серый, если дошёл, но не умер
+                  : 'transparent', // не дошёл — прозрачный
                 transition: 'background-color 0.3s',
               }}
             />

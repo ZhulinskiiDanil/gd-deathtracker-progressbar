@@ -238,5 +238,6 @@
 .progressBar > div:hover {
   position: relative;
   z-index: 1;
-  transform: scale(2);
+  box-shadow: 0 0 2rem 0.25rem black;
+  border: 1px solid white;
 }
