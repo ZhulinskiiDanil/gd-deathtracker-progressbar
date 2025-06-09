@@ -1,8 +1,13 @@
 import styles from './LevelCollectedData.module.css';
 
-import { UIButton } from '@/shared/ui/Button/ui';
-import { LevelRuns } from '@/widgets/LevelRuns/ui';
 import { useState } from 'react';
+
+// UI
+import { UIButton } from '@/shared/ui/Button/ui';
+
+// Data types components
+import { LevelRuns } from '@/widgets/LevelRuns/ui';
+import { LevelPassrate } from '@/widgets/LevelPassrate/ui';
 
 enum LevelDataType {
   RUNS = 'RUNS',
@@ -19,12 +24,8 @@ export function LevelCollectedData({ texts }: { texts: string[] }) {
         <UIButton fill onClick={() => setDataType(LevelDataType.RUNS)}>
           Runs bars
         </UIButton>
-        <UIButton
-          fill
-          onClick={() => setDataType(LevelDataType.PASSRATE)}
-          disabled
-        >
-          Passrate table (beta)
+        <UIButton fill onClick={() => setDataType(LevelDataType.PASSRATE)}>
+          Passrate table
         </UIButton>
         <UIButton
           fill
@@ -48,6 +49,8 @@ function DataByType({
 }) {
   if (dataType === LevelDataType.RUNS) {
     return <LevelRuns texts={texts} />;
+  } else if (dataType === LevelDataType.PASSRATE) {
+    return <LevelPassrate texts={texts} />;
   } else {
     return <></>;
   }

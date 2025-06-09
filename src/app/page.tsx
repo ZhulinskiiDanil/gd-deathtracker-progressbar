@@ -88,19 +88,22 @@ export default function Home() {
               </span>
             ))}
           </div>
-          <div className={styles.subtitle}>
-            {stats.totalAttempts ? (
-              <>
-                Attempts: <b>{stats.totalAttempts}</b>
-              </>
-            ) : (
-              'Select a level'
-            )}
-            {!!stats.totalAttempts && <span>/ {stats.totalPlaytime}</span>}
-          </div>
-          <hr className={styles.hr} style={{ marginBottom: '1rem' }} />
-          <LevelCollectedData texts={texts} />
-          <hr className={styles.hr} style={{ marginTop: '1rem' }} />
+
+          {!!stats.totalAttempts ? (
+            <div className={styles.subtitle}>
+              Attempts: <b>{stats.totalAttempts}</b>
+              {!!stats.totalAttempts && <span>/ {stats.totalPlaytime}</span>}
+            </div>
+          ) : (
+            <div className={styles.title}>Upload your level backups</div>
+          )}
+          {!!texts.length && (
+            <>
+              <hr className={styles.hr} style={{ marginBottom: '1rem' }} />
+              <LevelCollectedData texts={texts} />
+              <hr className={styles.hr} style={{ marginTop: '1rem' }} />
+            </>
+          )}
           <div className={styles.content}>
             <div className={styles.buttons}>
               <input

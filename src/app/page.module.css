@@ -8,11 +8,38 @@
   background: linear-gradient(
     to right,
     transparent,
-    #2a2a2a 20%,
-    #2a2a2a 80%,
+    #222 20%,
+    #555,
+    #222 80%,
     transparent
   );
+  background-size: 200% 100%;
+  background-position: 0% 0%;
   opacity: 0.6;
+  animation: hrGradientMove 3s linear infinite;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+}
+
+@keyframes hrGradientMove {
+  0% {
+    background-position: -100% 0%;
+  }
+  100% {
+    background-position: 100% 0%;
+  }
 }
 
 .main {
