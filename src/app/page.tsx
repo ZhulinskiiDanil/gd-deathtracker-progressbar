@@ -25,9 +25,9 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.back}></div>
         <div className={styles.wrapper}>
-          <p className={styles.title}>From zero</p>
-          <ProgressBar text={text} />
           <p className={styles.title}>Runs</p>
+          <ProgressBar text={text} />
+          <p className={styles.title}>From zero</p>
           <ProgressBar text={text} fromZero />
           <div className={styles.content}>
             <label className={styles.label}>
@@ -55,6 +55,13 @@ export default function Home() {
   );
 }
 
+/**
+ *
+ * @param percent Current percent
+ * @param freq Amount of deaths
+ * @param to Run to
+ * @param max The maximum death of deaths on the current Freq
+ */
 function interpolateColor(freq: number, max: number) {
   const ratio = freq / max; // 0 — мало смертей, 1 — максимум смертей
 
@@ -69,23 +76,10 @@ function interpolateColor(freq: number, max: number) {
 
 // Парсинг для обычного блока "1% x14"
 function parseNormalData(text: string) {
-  const regex = /(\d+)% x(\d+)/g;
-  let match;
-  const data: { percent: number; freq: number }[] = [];
-  while ((match = regex.exec(text)) !== null) {
-    data.push({
-      percent: parseInt(match[1], 10),
-      freq: parseInt(match[2], 10),
-    });
-  }
-  return data;
-}
-
-// Парсинг для блока Runs "0% - 1% x1"
-function parseFromZeroData(text: string) {
-  const regex = /(\d+)% - (\d+)% x(\d+)/g;
+  const regex = /(\d+)%\s*-\s*(\d+)%\s*x(\d+)/g;
   let match;
   const data: { from: number; to: number; freq: number }[] = [];
+
   while ((match = regex.exec(text)) !== null) {
     data.push({
       from: parseInt(match[1], 10),
@@ -93,6 +87,43 @@ function parseFromZeroData(text: string) {
       freq: parseInt(match[3], 10),
     });
   }
+
+  return data;
+}
+
+// Парсинг для блока Runs "0% - 1% x1"
+function parseFromZeroData(text: string) {
+  const data: { from: number; to: number; freq: number }[] = [];
+
+  const lines = text.split('\n');
+  let inFromZeroSection = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (trimmed === 'From 0:') {
+      inFromZeroSection = true;
+      continue;
+    }
+
+    if (/^\w+:/i.test(trimmed)) {
+      // если встретили новую секцию вроде "Runs:", "Session:" — выходим
+      if (inFromZeroSection) break;
+    }
+
+    if (inFromZeroSection) {
+      const match = /^(\d+)%\s*x(\d+)/.exec(trimmed);
+
+      if (match) {
+        data.push({
+          from: 0,
+          to: parseInt(match[1], 10),
+          freq: parseInt(match[2], 10),
+        });
+      }
+    }
+  }
+
   return data;
 }
 
@@ -103,12 +134,22 @@ function ProgressBar({
   text: string;
   fromZero?: boolean;
 }) {
-  const data = useMemo(() => {
-    if (!text.trim()) return [];
+  const { data, maxReached } = useMemo(() => {
+    if (!text.trim()) return { data: [], maxReached: 0 };
+
     if (fromZero) {
-      return parseFromZeroData(text);
+      const data = parseFromZeroData(text);
+
+      return {
+        data,
+        maxReached: Math.max(...data.map((d) => ('to' in d ? d.to : 0))),
+      };
     } else {
-      return parseNormalData(text);
+      const data = parseNormalData(text);
+      const maxPercent =
+        data.length > 0 ? Math.max(...data.map((d) => d.to)) : 0;
+
+      return { data, maxReached: maxPercent };
     }
   }, [text, fromZero]);
 
@@ -132,13 +173,16 @@ function ProgressBar({
   }
 
   const maxFreq = Math.max(...data.map((d) => d.freq));
-  const maxReached = fromZero
-    ? Math.max(...data.map((d) => ('to' in d ? d.to : 0)))
-    : Math.max(...data.map((d) => ('percent' in d ? d.percent : 0)));
 
   return (
     <div className={styles.progressBarWrapper}>
       {/* Метки сверху */}
+      <p
+        className={styles.title}
+        style={{ fontSize: '2rem', padding: '1rem', paddingLeft: 0 }}
+      >
+        Max reached: {maxReached}
+      </p>
       <div
         style={{
           display: 'flex',
@@ -167,6 +211,8 @@ function ProgressBar({
         {[...Array(100)].map((_, i) => {
           let freq = 0;
           let label = `${i}%`;
+          let to = 0;
+          const percent = i + 1;
           if (fromZero) {
             const entry = data.find(
               (d): d is { from: number; to: number; freq: number } =>
@@ -175,22 +221,30 @@ function ProgressBar({
                 i >= (d as any).from &&
                 i < (d as any).to
             );
+
             if (entry) {
+              to = entry.to;
               freq = entry.freq;
-              label = `${entry.from}% - ${entry.to}%`;
+              label = `Index + 1: ${i + 1} ${entry.from}% - ${entry.to}%`;
             }
           } else {
             const entry = data.find(
-              (d): d is { percent: number; freq: number } =>
-                typeof (d as any).percent === 'number' &&
-                (d as any).percent === i
+              (d): d is { from: number; to: number; freq: number } =>
+                typeof d.from === 'number' &&
+                typeof d.to === 'number' &&
+                i >= d.from &&
+                i < d.to
             );
+
             if (entry) {
+              to = entry.to;
+              label = `Index + 1: ${i + 1} ${entry.from}% - ${entry.to}%`;
               freq = entry.freq;
             }
           }
 
           const show = i <= maxReached;
+          const isEmptyCell = percent !== to && fromZero;
 
           return (
             <div
@@ -199,7 +253,7 @@ function ProgressBar({
               style={{
                 flex: 1,
                 backgroundColor: show
-                  ? freq > 0
+                  ? freq > 0 && !isEmptyCell
                     ? interpolateColor(freq, maxFreq)
                     : 'rgba(80, 80, 80, 0.15)' // серый, если дошёл, но не умер
                   : 'transparent', // не дошёл — прозрачный
