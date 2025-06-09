@@ -58,9 +58,16 @@ export default function Home() {
               <span className={styles.beta}>(beta)</span>
             </div>
           )}
-          <div className={styles.title}>
-            {stats.attempts || 'Select a level'}
-            {!!stats.attempts && <span>{stats.playtime}</span>}
+          <div className={styles.title}>{stats.levelName}</div>
+          <div className={styles.subtitle}>
+            {stats.attempts ? (
+              <>
+                Attempts: <b>{stats.attempts}</b>
+              </>
+            ) : (
+              'Select a level'
+            )}
+            {!!stats.attempts && <span>/ {stats.playtime}</span>}
           </div>
           <hr className={styles.hr} />
           <p className={styles.paragraph}>Runs</p>
@@ -101,7 +108,7 @@ export default function Home() {
               </>
             )}
             <button className={styles.button} onClick={() => setText('')}>
-              Reset progress bar
+              RESET PROGRESS BAR
             </button>
           </div>
         </div>
