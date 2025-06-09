@@ -27,11 +27,9 @@ export default function Home() {
     } else {
       return null;
     }
-  }, [demonlist]);
+  }, [demonlist, stats]);
   const imageUrl =
     levelData?.level_id && getLevelThumbnailById(levelData.level_id);
-
-  console.log(demonlist, levelData);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
