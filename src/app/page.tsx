@@ -22,8 +22,6 @@ export default function Home() {
         setText(result as string);
       };
       reader.readAsText(file);
-    } else {
-      alert('Пожалуйста, выберите .txt файл');
     }
   };
 
