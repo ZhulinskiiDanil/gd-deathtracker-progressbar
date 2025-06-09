@@ -4,9 +4,14 @@
 
 .hr {
   border: none;
-  height: 1px;
-  background: linear-gradient(to right, #111, #666, #111);
-  margin: 1.5rem 0;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    #2a2a2a 20%,
+    #2a2a2a 80%,
+    transparent
+  );
   opacity: 0.6;
 }
 
@@ -34,7 +39,7 @@
 }
 
 .main .content {
-  margin-top: 1rem;
+  margin-top: 2rem;
 
   display: flex;
   flex-direction: column;
@@ -44,6 +49,11 @@
   padding: 1.5rem;
   background: #000;
   border-radius: 2rem;
+}
+
+.main .content .levelInfo {
+  display: flex;
+  flex-direction: column;
 }
 
 .main .back {

@@ -10,6 +10,8 @@ import { getDemonList } from '@/shared/api/getDemonList';
 import { ProgressBar } from '@/shared/ui/ProgressBar/ui';
 import { findLevelByName } from '@/shared/utils/demonlist/findLevelByName';
 import { getLevelThumbnailById } from '@/shared/utils/getLevelThumbnailById';
+import Grid from '@/shared/ui/Grid/ui';
+import GridItem from '@/shared/ui/GridItem/ui';
 
 export default function Home() {
   const { data: demonlist } = useQuery({
@@ -94,12 +96,12 @@ export default function Home() {
             )}
             {!!stats.totalAttempts && <span>/ {stats.totalPlaytime}</span>}
           </div>
-          <hr className={styles.hr} />
+          <hr className={styles.hr} style={{ marginBottom: '1rem' }} />
           <p className={styles.paragraph}>Runs</p>
           <ProgressBar texts={texts} />
           <p className={styles.paragraph}>From zero</p>
           <ProgressBar texts={texts} fromZero />
-          <hr className={styles.hr} />
+          <hr className={styles.hr} style={{ marginTop: '1rem' }} />
           <div className={styles.content}>
             <div className={styles.buttons}>
               <label className={styles.button}>
@@ -121,27 +123,35 @@ export default function Home() {
                 </button>
               )}
             </div>
-            {/* <textarea
-              value={text}
-              readOnly
-              rows={10}
-              className={styles.textarea}
-            /> */}
             {levelData && (
-              <>
+              <div className={styles.levelInfo}>
                 <p
                   className={styles.paragraph}
                   style={{ marginTop: '1rem', fontSize: '2rem' }}
                 >
-                  Demonlist data
+                  Level Information
                 </p>
-                <textarea
-                  value={JSON.stringify(levelData, undefined, 2)}
-                  readOnly
-                  rows={10}
-                  className={styles.textarea}
-                />
-              </>
+                <hr className={styles.hr} style={{ margin: '1rem 0' }} />
+                <Grid>
+                  <GridItem title="Level ID">{levelData.level_id}</GridItem>
+                  <GridItem title="Length (seconds)">
+                    {levelData.length}
+                  </GridItem>
+                  <GridItem title="Verifier">{levelData.verifier}</GridItem>
+                  <GridItem title="Created in">{levelData.created_in}</GridItem>
+                  <GridItem title="Objects count">{levelData.objects}</GridItem>
+                  <GridItem title="Holder">{levelData.holder}</GridItem>
+                  <GridItem title="Password">{levelData.password}</GridItem>
+                </Grid>
+                <hr className={styles.hr} style={{ margin: '1rem 0' }} />
+                <Grid>
+                  <GridItem title="Place">{levelData.place}</GridItem>
+                  <GridItem title="Score list">{levelData.score}</GridItem>
+                  <GridItem title="Minimal percent">
+                    {levelData.minimal_percent}
+                  </GridItem>
+                </Grid>
+              </div>
             )}
           </div>
         </div>
