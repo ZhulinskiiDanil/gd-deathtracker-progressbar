@@ -6,8 +6,7 @@ import { parseLevelStats } from '@/shared/utils/parseLevelStats';
 import { findLevelByName } from '@/shared/utils/demonlist/findLevelByName';
 import { getLevelThumbnailById } from '@/shared/utils/getLevelThumbnailById';
 
-import { useQuery } from '@tanstack/react-query';
-import { getDemonList } from '@/shared/api/getDemonList';
+import { useDemonlistQuery } from '@/shared/hooks/useDemonlistQuery';
 
 import { Grid } from '@/shared/ui/Grid/ui';
 import { GridItem } from '@/shared/ui/GridItem/ui';
@@ -16,11 +15,7 @@ import { LevelCollectedData } from '@/widgets/LevelCollectedData/ui';
 
 export default function Home() {
   const fileLabelId = useId();
-  const { data: demonlist } = useQuery({
-    queryKey: ['demonlist'],
-    queryFn: getDemonList,
-    initialData: [],
-  });
+  const { data: demonlist } = useDemonlistQuery();
   const [texts, setTexts] = useState<string[]>([]);
   const stats = useMemo(() => {
     return parseLevelStats(texts);
